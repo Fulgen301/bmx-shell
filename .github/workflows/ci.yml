@@ -1,0 +1,35 @@
+name: Rust
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build Debug
+      run: cargo build --verbose
+    - name: Test Debug
+      run: cargo test --verbose
+    - name: Build Release
+      run: cargo build -r --verbose
+    - name: Test Release
+      run: cargo test -r --verbose
+    - uses: action/upload-artifact@v4
+      with:
+        name: Binaries
+        path: |
+          target/release/bmx_shell.dll
+          target/release/bmx_shell.pdb
+      
