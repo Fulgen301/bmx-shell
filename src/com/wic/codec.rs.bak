@@ -1,0 +1,102 @@
+use std::{rc::Rc, sync::RwLock};
+
+use windows::Win32::{
+    Foundation::{HINSTANCE, HWND, LPARAM, LRESULT, WPARAM},
+    Graphics::Gdi::HBRUSH,
+    System::Com::IContextCallback,
+    UI::WindowsAndMessaging::{
+        CreateWindowExW, DefWindowProcW, RegisterClassExW, SetWindowLongPtrW, UnregisterClassW,
+        CW_USEDEFAULT, GWLP_USERDATA, HCURSOR, HICON, HWND_MESSAGE, WINDOW_EX_STYLE, WINDOW_STYLE,
+        WNDCLASSEXW, WNDCLASS_STYLES,
+    },
+};
+use windows_core::{w, PCWSTR};
+
+use crate::util::get_this_module_handle;
+
+struct WindowClass {
+    instance: HINSTANCE,
+    atom: u16,
+}
+
+impl WindowClass {
+    pub fn new(wndclass: &WNDCLASSEXW) -> windows::core::Result<Self> {
+        match unsafe { RegisterClassExW(wndclass) } {
+            0 => Err(windows::core::Error::from_win32()),
+            atom => Ok(Self {
+                instance: wndclass.hInstance,
+                atom,
+            }),
+        }
+    }
+}
+
+impl Drop for WindowClass {
+    fn drop(&mut self) {
+        unsafe {
+            UnregisterClassW(PCWSTR::from_raw(self.atom as _), self.instance);
+        }
+    }
+}
+
+struct RegisteredCodecsData {
+    window_class: WindowClass,
+    window: HWND,
+}
+
+pub struct RegisteredCodecs {
+    inner: IContextCallback,
+}
+
+unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
+    DefWindowProcW(hwnd, msg, wparam, lparam)
+}
+
+impl RegisteredCodecs {
+    pub fn new() -> windows::core::Result<Self> {
+        Ok(())
+        /*let instance = unsafe { get_this_module_handle()? }.into();
+
+        let window_class = WindowClass::new(&WNDCLASSEXW {
+            cbSize: std::mem::size_of::<WNDCLASSEXW>() as _,
+            style: WNDCLASS_STYLES(0),
+            lpfnWndProc: Some(wndproc),
+            cbClsExtra: 0,
+            cbWndExtra: 0,
+            hInstance: instance,
+            hIcon: HICON(std::ptr::null_mut()),
+            hCursor: HCURSOR(std::ptr::null_mut()),
+            hbrBackground: HBRUSH(std::ptr::null_mut()),
+            lpszMenuName: PCWSTR::null(),
+            lpszClassName: w!("X16BMXRegisteredCodecs"),
+            hIconSm: HICON(std::ptr::null_mut()),
+        })?;
+
+        let window = unsafe {
+            CreateWindowExW(
+                WINDOW_EX_STYLE(0),
+                PCWSTR::from_raw(window_class.atom as _),
+                w!("X16BMXRegisteredCodecs"),
+                WINDOW_STYLE(0),
+                0,
+                0,
+                CW_USEDEFAULT,
+                CW_USEDEFAULT,
+                HWND_MESSAGE,
+                None,
+                instance,
+                None,
+            )?
+        };
+
+        let inner = Rc::new_cyclic(|weak| unsafe {
+            SetWindowLongPtrW(window, GWLP_USERDATA, weak.into_raw() as _);
+            RegisteredCodecsData {
+                window_class,
+                window,
+            }
+        });
+
+        Ok(Self { inner })*/
+    }
+}
