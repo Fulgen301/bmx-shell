@@ -27,7 +27,7 @@ jobs:
       run: cargo build -r --verbose
     - name: Test Release
       run: cargo test -r --verbose
-    - uses: action/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
         name: Binaries
         path: |
