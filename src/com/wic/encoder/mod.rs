@@ -424,20 +424,6 @@ impl IWICBitmapFrameEncode_Impl for FrameEncoder_Impl {
             (source_width, source_height)
         };
 
-        let (dpi_x, dpi_y) = unsafe {
-            let mut dpi_x = 0.0;
-            let mut dpi_y = 0.0;
-            bitmap_source.GetResolution(&raw mut dpi_x, &raw mut dpi_y)?;
-            (dpi_x, dpi_y)
-        };
-
-        if (96.0 - dpi_x).abs() > 0.5 || (96.0 - dpi_y).abs() > 0.5 {
-            return Err(windows::core::Error::new(
-                WINCODEC_ERR_UNSUPPORTEDOPERATION,
-                format!("DPI must be 96, got {dpi_x}x{dpi_y}"),
-            ));
-        }
-
         let pixel_format = unsafe { bitmap_source.GetPixelFormat()? };
         let pixel_format_bit_depth = pixel_format_to_bit_depth(&pixel_format)
             .ok_or(windows::core::Error::new(
