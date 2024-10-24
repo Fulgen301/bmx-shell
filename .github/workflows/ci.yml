@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - '*'
+    tags:
+      - '*'
   pull_request:
     branches:
       - '*'
@@ -16,6 +18,11 @@ jobs:
     name: Autobuild
 
     runs-on: windows-latest
+    env:
+      IS_RELEASE: ${{ startsWith(github.ref, 'refs/tags/') }}
+
+    permissions:
+      contents: write
 
     steps:
     - uses: actions/checkout@v4
@@ -34,3 +41,29 @@ jobs:
         path: |
           target/release/bmx_shell.dll
           target/release/bmx_shell.pdb
+    - name: Set Working Directory
+      shell: pwsh
+      run:
+         echo "working-directory=$PWD" >> $env:GITHUB_ENV
+
+    - name: Create Installer
+      uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+      with:
+        path: installer/setup.iss
+        options: /DBinariesDir=${{ env.working-directory }}/target/release
+    - uses: actions/upload-artifact@v4
+      with:
+        name: Installer
+        path: installer/Output/bmx_shell_setup.exe
+    - name: "Release"
+      uses: ncipollo/release-action@v1.11.2
+      if: ${{ env.IS_RELEASE == 'true' }}
+      with:
+        artifacts: |
+          target/release/bmx_shell.dll
+          target/release/bmx_shell.pdb
+          installer/Output/bmx_shell_setup.exe
+        allowUpdates: true
+        artifactErrorsFailBuild: true
+        replacesArtifacts: true
+        generateReleaseNotes: true
