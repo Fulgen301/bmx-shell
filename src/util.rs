@@ -143,5 +143,5 @@ pub fn get_module_path(module: HMODULE) -> windows::core::Result<Vec<u16>> {
 }
 
 pub unsafe fn get_this_module_path() -> windows::core::Result<Vec<u16>> {
-    get_module_path(get_this_module_handle()?)
+    get_module_path(unsafe { get_this_module_handle()? })
 }

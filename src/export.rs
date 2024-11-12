@@ -24,7 +24,7 @@ use crate::{
 };
 
 #[allow(non_snake_case)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 unsafe extern "system" fn DllRegisterServer() -> HRESULT {
     fn do_register() -> windows::core::Result<()> {
         let transaction = Transaction::new(true)?;
@@ -47,7 +47,7 @@ unsafe extern "system" fn DllRegisterServer() -> HRESULT {
 }
 
 #[allow(non_snake_case)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 unsafe extern "system" fn DllUnregisterServer() -> HRESULT {
     fn do_unregister() -> windows::core::Result<()> {
         let transaction = Transaction::new(true)?;
@@ -64,7 +64,7 @@ unsafe extern "system" fn DllUnregisterServer() -> HRESULT {
 }
 
 #[allow(non_snake_case)]
-#[no_mangle]
+#[unsafe(no_mangle)]
 unsafe extern "system" fn DllGetClassObject(
     clsid: *const GUID,
     iid: *const GUID,
@@ -106,7 +106,9 @@ unsafe extern "system" fn DllGetClassObject(
         _ => return CLASS_E_CLASSNOTAVAILABLE,
     };
 
-    ComObject::new(class_factory)
-        .as_interface::<IUnknown>()
-        .query(iid, ppv)
+    unsafe {
+        ComObject::new(class_factory)
+            .as_interface::<IUnknown>()
+            .query(iid, ppv)
+    }
 }

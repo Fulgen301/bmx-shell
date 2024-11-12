@@ -49,7 +49,7 @@ use crate::com::CoClass;
 use crate::get_with_buffer;
 
 fn pcwstr_is_equal_to_slice_no_case(first: PCWSTR, second: &[u16]) -> bool {
-    extern "C" {
+    unsafe extern "C" {
         fn _wcsnicmp(a: *const u16, b: *const u16, count: usize) -> i32;
     }
 
@@ -57,7 +57,7 @@ fn pcwstr_is_equal_to_slice_no_case(first: PCWSTR, second: &[u16]) -> bool {
 }
 
 fn pcwstr_is_equal_to_pcwstr_no_case(first: PCWSTR, second: PCWSTR) -> bool {
-    extern "C" {
+    unsafe extern "C" {
         fn _wcsicmp(a: *const u16, b: *const u16) -> i32;
     }
 

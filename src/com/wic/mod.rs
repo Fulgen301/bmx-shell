@@ -84,7 +84,7 @@ pub fn get_component_iterator<T: Interface>(
     imaging_factory: &IWICImagingFactory,
     component_types: WICComponentType,
     enumerate_options: WICComponentEnumerateOptions,
-) -> windows::core::Result<impl Iterator<Item = windows::core::Result<T>>> {
+) -> windows::core::Result<impl Iterator<Item = windows::core::Result<T>> + use<T>> {
     Ok(TypedComponentIterator::<T>::new(unsafe {
         imaging_factory
             .CreateComponentEnumerator(component_types.0 as _, enumerate_options.0 as _)?

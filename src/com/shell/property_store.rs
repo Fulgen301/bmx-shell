@@ -48,7 +48,7 @@ fn propvariant_init_lpwstr(string: PCWSTR) -> windows::core::Result<PROPVARIANT>
         propvariant: &'a PROPVARIANT,
         _helper: &'a T,
     ) -> T {
-        std::mem::transmute_copy::<PROPVARIANT, T>(propvariant)
+        unsafe { std::mem::transmute_copy::<PROPVARIANT, T>(propvariant) }
     }
 
     let propvar_impl = PROPVARIANT::new();
